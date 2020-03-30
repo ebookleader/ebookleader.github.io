@@ -7,7 +7,7 @@ layout: default
   <div class="scrim {% if page.cover %}has-cover{% endif %}">
     <header class="post-header">
       <h1 class="title">{{ page.title }}</h1>
-      <p class="info">by <strong>{{ page.author }}</strong></p>
+      <!-- <p class="info">by <strong>{{ page.author }}</strong></p> -->
     </header>
   </div>
 </div>
@@ -41,11 +41,11 @@ layout: default
 {% endif %}
 {% endif %}
 
-<section class="rss">
+<!-- <section class="rss">
   <p class="rss-subscribe text"><strong>Subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></strong></p>
-</section>
+</section> -->
 
-<section class="share">
+<!-- <section class="share">
   <span>Share: </span>
   {% for social in site.social %}
     {% capture full_url %}{{ site.url }}{{ site.baseurl }}{{ page.url }}{% endcapture %}
@@ -90,7 +90,7 @@ layout: default
       </a>
     {% endif %}
   {% endfor %}
-</section>
+</section> -->
 {% if site.inter_post_navigation == true %}
 	<section class="post-navigation">
 		<span class="prev-post">
