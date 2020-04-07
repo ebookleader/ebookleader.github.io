@@ -9,8 +9,8 @@ exclude:
   - "/vendor/"
 
 # Site settings
-title: 이게 왜 되지?
-subtitle: "작성한 프로그램이 엉망진창이지만 의도한 일을 해버리는 인생 청산을 위한 노트"
+title: 얼떨결에 성공하게해주세요
+subtitle: ""
 email: hemslje@gmail.com
 name: Jeongeun Lee
 description: >
