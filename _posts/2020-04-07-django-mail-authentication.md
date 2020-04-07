@@ -51,9 +51,14 @@ class UserSignUpForm(UserCreationForm):
 --------------------------------------------
 
 ### Token을 만드는 class 작성
+<a href='https://simpleisbetterthancomplex.com/tutorial/2016/08/24/how-to-create-one-time-link.html'>
+password token generator 참고</a>
 {% highlight python %}
 # token_generator.py
+
+# PasswordResetTokenGenerator를 사용하여 토큰 생성
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+# for wrapping over differences between python2 and python3
 import six
 
 class TokenGenerator(PasswordResetTokenGenerator):
@@ -66,4 +71,58 @@ account_activation_token = TokenGenerator()
 
 {% endhighlight %}
 
+<ol>
+<li>사용자 데이터와 관련해서 hash값을 만들고 비밀번호가 리셋되면 값이 바뀌는 형식</li>
+<li>text_type은 유니코드 정수로부터 유니코드 문자열을 가지고 오며, 사용자의 pk, 현재시간, 활성화를 합쳐서 token을 생성해 리턴한다</li>
+</ol>
 --------------------------------------------
+
+### 회원가입 View
+{% highlight python %}
+# views.py
+
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
+from .forms import UserSignUpForm
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .token_generator import account_activation_token
+from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
+
+# signup method
+def signupuser(request):
+    if request.method == 'GET':
+        # 위에서 만들어두었던 UserSignUpForm 사용
+        form = UserSignUpForm()
+    else:
+        form = UserSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            current_site = get_current_site(request)
+            email_subject = 'Activate your account'
+            message = render_to_string('todoapp/activate_account.html',
+                                       {
+                                           'user':user,
+                                           'domain':current_site.domain,
+                                            'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+                                           'token':account_activation_token.make_token(user),
+                                        }
+                                       )
+            to_email = form.cleaned_data.get('email')
+            email = EmailMessage(email_subject,message,to=[to_email])
+            email.send()
+            return HttpResponse('we have sent you an email')
+    return render(request,'todoapp/signup.html',{'form':form})
+{% endhighlight %}
+
+<ol>
+<li>`GET`이면 UserSignUpForm을 전달</li>
+<li>`POST`면 입력받은 값이 유효한지 체크하고 이메일 인증을 완료한 사용자만 로그인 할 수 있도록 가입 시에는 is_active를 False로 설정한다</li>
+<li></li>
+</ol>
